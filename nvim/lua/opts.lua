@@ -2,6 +2,9 @@ vim.cmd("colorscheme carbonfox")
 
 local opt = vim.opt
 
+opt.swapfile = false
+opt.backup = false
+
 -- [[ Context ]]
 opt.colorcolumn = '80'           -- str:  Show col for max line length
 opt.number = true                -- bool: Show line numbers
@@ -9,6 +12,7 @@ opt.relativenumber = true        -- bool: Show relative line numbers
 opt.scrolloff = 8                -- int:  Min num lines of context
 opt.signcolumn = "yes"           -- str:  Show the sign column
 opt.foldenable = false           -- bool: Disable folding by default
+opt.wrap = false
 
 -- [[ Filetypes ]]
 
@@ -34,7 +38,6 @@ opt.tabstop = 4                  -- num:  Number of spaces tabs count for
 opt.splitright = true            -- bool: Place new window to right of current one
 opt.splitbelow = true            -- bool: Place new window below the current one
 
-
 --Set completeopt to have a better completion experience
 -- :help completeopt
 -- menuone: popup even when there's only one match
@@ -44,16 +47,16 @@ opt.splitbelow = true            -- bool: Place new window below the current one
 -- updatetime: set updatetime for CursorHold
 opt.completeopt = {'menuone', 'noselect', 'noinsert'}
 opt.shortmess = vim.opt.shortmess + { c = true}
-vim.api.nvim_set_option('updatetime', 300) 
+vim.api.nvim_set_option('updatetime', 50) 
 
 -- Fixed column for diagnostics to appear
 -- Show autodiagnostic popup on cursor hover_range
 -- Goto previous / next diagnostic warning / error 
 -- Show inlay_hints more frequently 
-vim.cmd([[
-set signcolumn=yes
-autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
-]])
+-- vim.cmd([[
+-- set signcolumn=yes
+-- autocmd CursorHold * lua vim.diagnostic.open_float(nil, { focusable = false })
+-- ]])
 
 -- Treesitter folding 
 vim.wo.foldmethod = 'expr'
