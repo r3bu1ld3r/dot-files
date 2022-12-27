@@ -57,7 +57,6 @@ lsp.set_preferences({
 })
 
 local rt = require("rust-tools")
-rt.setup()
 
 lsp.on_attach(function(client, bufnr)
     local opts = { buffer = bufnr, remap = true }
@@ -83,4 +82,15 @@ lsp.on_attach(function(client, bufnr)
     end
 end)
 
+local rust_lsp = lsp.build_options('rust_analyzer', {})
 lsp.setup()
+
+rust_lsp.settings = {
+    ["rust-analyzer"] = {
+        inlayHints = { locationLinks = false }
+    }
+}
+
+rt.setup({
+    server = rust_lsp
+})
