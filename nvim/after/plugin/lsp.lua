@@ -35,6 +35,7 @@ lsp.setup_nvim_cmp({
     mapping = cmd_mappings,
     sources = {
         { name = 'path' },
+        { name = 'copilot'},
         { name = 'nvim_lsp',               keyword_length = 3 },
         { name = 'nvim_lsp_signature_help' },
         { name = 'nvim_lua',               keyword_length = 2 },

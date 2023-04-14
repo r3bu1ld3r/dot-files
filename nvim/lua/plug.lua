@@ -1,5 +1,4 @@
 return require('packer').startup(function()
-
     -- Colorscheme
     use('EdenEast/nightfox.nvim')
 
@@ -35,7 +34,8 @@ return require('packer').startup(function()
     -- Navigation plugins
     use('nvim-lua/plenary.nvim')
     use({
-        'nvim-telescope/telescope.nvim', tag = '0.1.0',
+        'nvim-telescope/telescope.nvim',
+        tag = '0.1.0',
         requires = { { 'nvim-lua/plenary.nvim' } }
     })
 
@@ -51,4 +51,37 @@ return require('packer').startup(function()
 
     -- Undo history
     use('mbbill/undotree')
+
+    -- Copilot
+    use {
+        "zbirenbaum/copilot.lua",
+        cmd = "Copilot",
+        event = "InsertEnter",
+        -- disable default copilot.lua configuartion for avoiding interfere with copilot-cmp
+        config = function()
+            require("copilot").setup({
+                suggestion = { enabled = false },
+                panel = { enabled = false },
+            })
+        end,
+    }
+
+    use {
+        "zbirenbaum/copilot-cmp",
+        after = { "copilot.lua" },
+        config = function()
+            require("copilot_cmp").setup()
+        end
+    }
+
+    -- ChatGPT
+    use({
+        "jackMort/ChatGPT.nvim",
+        requires = {
+            "MunifTanjim/nui.nvim",
+            "nvim-lua/plenary.nvim",
+            "nvim-telescope/telescope.nvim"
+        }
+    })
+
 end)
