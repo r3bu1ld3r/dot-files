@@ -23,8 +23,10 @@ return require('packer').startup(function()
             { 'rafamadriz/friendly-snippets' },
         }
     }
-
+    
+    use('lvimuser/lsp-inlayhints.nvim' )
     use('simrat39/rust-tools.nvim')
+    
     -- Highlight syntax & folding
     use('nvim-treesitter/nvim-treesitter', { run = ':TSUpdate' })
 
@@ -35,7 +37,6 @@ return require('packer').startup(function()
     use('nvim-lua/plenary.nvim')
     use({
         'nvim-telescope/telescope.nvim',
-        tag = '0.1.0',
         requires = { { 'nvim-lua/plenary.nvim' } }
     })
 

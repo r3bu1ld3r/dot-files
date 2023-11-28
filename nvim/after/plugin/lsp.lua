@@ -1,9 +1,13 @@
 local lsp = require('lsp-zero')
+local ih = require('lsp-inlayhints')
+ih.setup()
+
 lsp.preset('recommended')
 
 lsp.ensure_installed({
     'rust_analyzer',
     'lua_ls',
+    'gopls',
 })
 
 -- Fix Undefined global 'vim'
@@ -15,6 +19,32 @@ lsp.configure('lua_ls', {
             }
         }
     }
+})
+
+-- Configure gopls
+lsp.configure('gopls', {
+    on_attach = function(client, bufnr)
+        ih.on_attach(client, bufnr)
+    end,
+    settings = {
+        gopls = {
+            analyses = {
+                unusedparams = true,
+                shadow = true,
+            },
+            allowImplicitNetworkAccess = true,
+            staticcheck = true,
+            gofumpt = true,
+            hints = {
+                assignVariableTypes = true,
+                parameterNames = true,
+                compositeLiteralFields = true,
+                functionTypeParameters = true,
+                parameterTypes = true,
+            },
+            verboseOutput = true,
+        },
+    },
 })
 
 local cmp = require('cmp')
@@ -35,7 +65,7 @@ lsp.setup_nvim_cmp({
     mapping = cmd_mappings,
     sources = {
         { name = 'path' },
-        { name = 'copilot'},
+        { name = 'copilot' },
         { name = 'nvim_lsp',               keyword_length = 3 },
         { name = 'nvim_lsp_signature_help' },
         { name = 'nvim_lua',               keyword_length = 2 },
@@ -57,8 +87,8 @@ lsp.set_preferences({
     }
 })
 
+
 local rt = require("rust-tools")
-rt.setup({})
 
 lsp.on_attach(function(client, bufnr)
     local opts = { buffer = bufnr, remap = true }
