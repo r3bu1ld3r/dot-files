@@ -4,10 +4,16 @@ ih.setup()
 
 lsp.preset('recommended')
 
-lsp.ensure_installed({
-    'rust_analyzer',
-    'lua_ls',
-    'gopls',
+require('mason').setup({})
+require('mason-lspconfig').setup({
+    ensure_installed = {
+        'rust_analyzer',
+        'lua_ls',
+        'gopls',
+    },
+    handlers = {
+        lsp.default_setup,
+    },
 })
 
 -- Fix Undefined global 'vim'
@@ -48,22 +54,21 @@ lsp.configure('gopls', {
 })
 
 local cmp = require('cmp')
-local cmp_select = { behavior = cmp.SelectBehavior.Select }
-local cmd_mappings = lsp.defaults.cmp_mappings({
-    ['<C-p>'] = cmp.mapping.select_prev_item(cmp_select),
-    ['<C-n>'] = cmp.mapping.select_next_item(cmp_select),
-    -- Add tab support
-    ['<S-Tab>'] = cmp.mapping.select_prev_item(cmp_select),
-    ['<Tab>'] = cmp.mapping.select_next_item(cmp_select),
-    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-    ['<C-f>'] = cmp.mapping.scroll_docs(4),
-    ['<C-Space>'] = cmp.mapping.complete(),
-    ['<C-e>'] = cmp.mapping.close(),
-})
 
-lsp.setup_nvim_cmp({
-    mapping = cmd_mappings,
-    sources = {
+cmp.setup({
+    mapping = cmp.mapping.preset.insert({
+        ['<CR>'] = cmp.mapping.confirm({ select = false }),
+        ['<C-p>'] = cmp.mapping.select_prev_item(),
+        ['<C-n>'] = cmp.mapping.select_next_item(),
+        -- Add tab support
+        ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+        ['<Tab>'] = cmp.mapping.select_next_item(),
+        ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+        ['<C-f>'] = cmp.mapping.scroll_docs(4),
+        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<C-e>'] = cmp.mapping.close(),
+    }),
+    sources = cmp.config.sources({
         { name = 'path' },
         { name = 'copilot' },
         { name = 'nvim_lsp',               keyword_length = 3 },
@@ -72,7 +77,7 @@ lsp.setup_nvim_cmp({
         { name = 'buffer',                 keyword_length = 2 },
         { name = 'vsnip',                  keyword_length = 2 },
         { name = 'calc' }
-    }
+    })
 })
 
 lsp.set_preferences({
