@@ -1,5 +1,6 @@
 local lsp = require('lsp-zero')
 local ih = require('lsp-inlayhints')
+local luasnip = require('luasnip')
 ih.setup()
 
 lsp.preset('recommended')
@@ -7,7 +8,6 @@ lsp.preset('recommended')
 require('mason').setup({})
 require('mason-lspconfig').setup({
     ensure_installed = {
-        'rust_analyzer',
         'lua_ls',
         'gopls',
     },
@@ -29,9 +29,6 @@ lsp.configure('lua_ls', {
 
 -- Configure gopls
 lsp.configure('gopls', {
-    on_attach = function(client, bufnr)
-        ih.on_attach(client, bufnr)
-    end,
     settings = {
         gopls = {
             analyses = {
@@ -54,10 +51,17 @@ lsp.configure('gopls', {
 })
 
 local cmp = require('cmp')
-
 cmp.setup({
+    completion = {
+        autocomplete = {
+            cmp.TriggerEvent.TextChanged,
+            cmp.TriggerEvent.InsertEnter,
+        },
+        completeopt = "menu,menuone,noselect",
+        -- keyword_length = 0,
+    },
     mapping = cmp.mapping.preset.insert({
-        ['<CR>'] = cmp.mapping.confirm({ select = false }),
+        ['<CR>'] = cmp.mapping.confirm({ select = true }),
         ['<C-p>'] = cmp.mapping.select_prev_item(),
         ['<C-n>'] = cmp.mapping.select_next_item(),
         -- Add tab support
@@ -65,19 +69,28 @@ cmp.setup({
         ['<Tab>'] = cmp.mapping.select_next_item(),
         ['<C-b>'] = cmp.mapping.scroll_docs(-4),
         ['<C-f>'] = cmp.mapping.scroll_docs(4),
-        ['<C-Space>'] = cmp.mapping.complete(),
+        ['<A-Space>'] = cmp.mapping.complete({
+            config = {
+                sources = {
+                    { name = "copilot" },
+                }
+            }
+        }),
         ['<C-e>'] = cmp.mapping.close(),
     }),
+
     sources = cmp.config.sources({
-        { name = 'path' },
-        { name = 'copilot' },
-        { name = 'nvim_lsp',               keyword_length = 3 },
-        { name = 'nvim_lsp_signature_help' },
-        { name = 'nvim_lua',               keyword_length = 2 },
-        { name = 'buffer',                 keyword_length = 2 },
-        { name = 'vsnip',                  keyword_length = 2 },
-        { name = 'calc' }
-    })
+        { name = 'copilot',  group_index = 1, },
+        { name = 'nvim_lsp', group_index = 2, },
+        { name = 'path',     group_index = 3, },
+        { name = 'calc',     group_index = 3, },
+        { name = 'buffer',   group_index = 3, },
+        { name = 'vsnip',    group_index = 3, },
+    }),
+
+    experimental = {
+        ghost_text = true
+    }
 })
 
 lsp.set_preferences({
@@ -92,10 +105,8 @@ lsp.set_preferences({
     }
 })
 
-
-local rt = require("rust-tools")
-
 lsp.on_attach(function(client, bufnr)
+    require("lsp-inlayhints").on_attach(client, bufnr)
     local opts = { buffer = bufnr, remap = true }
 
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
@@ -109,14 +120,22 @@ lsp.on_attach(function(client, bufnr)
     vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
     vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
     vim.keymap.set('i', '<C-h>', vim.lsp.buf.signature_help, opts)
-
-    if client.name == "rust_analyzer" then
-        vim.keymap.set('n', '<leader>cq', rt.hover_actions.hover_actions, opts)
-        vim.keymap.set('n', '<leader>ca', rt.code_action_group.code_action_group, opts)
-        vim.keymap.set('n', '<leader>cc', rt.open_cargo_toml.open_cargo_toml, opts)
-        vim.keymap.set('n', '<leader>pm', rt.parent_module.parent_module, {})
-        vim.keymap.set('n', '<leader>em', rt.expand_macro.expand_macro, opts)
-    end
 end)
+
+vim.g.rustaceanvim = {
+    server = {
+        capabilities = lsp.get_capabilities(),
+        on_attach = function(client, bufnr)
+            local opts = { buffer = bufnr, remap = true }
+            lsp.on_attach(client, bufnr)
+            vim.keymap.set('n', '<leader>ca', function() vim.cmd.RustLsp('codeAction') end, opts)
+            vim.keymap.set('n', '<leader>cc', function() vim.cmd.RustLsp('openCargo') end, opts)
+            vim.keymap.set('n', '<leader>pm', function() vim.cmd.RustLsp('parentModule') end, opts)
+            vim.keymap.set('n', '<leader>em', function() vim.cmd.RustLsp('expandMacro') end, opts)
+            vim.keymap.set('n', '<leader>ru', function() vim.cmd.RustLsp('runnables') end, opts)
+            vim.keymap.set('n', '<leader>ws', function() vim.cmd.RustLsp('workspaceSymbol') end, opts)
+        end,
+    },
+}
 
 lsp.setup()

@@ -45,7 +45,7 @@ opt.splitbelow = true            -- bool: Place new window below the current one
 -- noselect: Do not select, force to select one from the menu
 -- shortness: avoid showing extra messages when using completion
 -- updatetime: set updatetime for CursorHold
-opt.completeopt = {'menuone', 'noselect', 'noinsert'}
+--opt.completeopt = {'menuone', 'noselect', 'noinsert'}
 opt.shortmess = vim.opt.shortmess + { c = true}
 vim.api.nvim_set_option('updatetime', 50) 
 

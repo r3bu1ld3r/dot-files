@@ -1,88 +1,103 @@
-return require('packer').startup(function()
+require("lazy").setup({
     -- Colorscheme
-    use('EdenEast/nightfox.nvim')
+    'EdenEast/nightfox.nvim',
 
-    use {
+    -- lsp zero
+    {
         'VonHeikemen/lsp-zero.nvim',
-        requires = {
+        dependencies = {
             -- LSP Support
-            { 'neovim/nvim-lspconfig' },
+            {
+                'neovim/nvim-lspconfig',
+                dependencies = {
+                    { 'lvimuser/lsp-inlayhints.nvim' },
+                }
+            },
             { 'williamboman/mason.nvim' },
             { 'williamboman/mason-lspconfig.nvim' },
 
             -- Autocompletion
-            { 'hrsh7th/nvim-cmp' },
+            {
+                'hrsh7th/nvim-cmp',
+                dependencies = {
+                    {
+                        "zbirenbaum/copilot-cmp",
+                        module = "copilot_cmp",
+                        config = function()
+                            require("copilot_cmp").setup({
+                                event = { "InsertEnter", "LspAttach" },
+                                fix_pairs = true,
+                            })
+                        end,
+                        dependencies = {
+                            {
+                                "zbirenbaum/copilot.lua",
+                                config = function()
+                                    require("copilot").setup({
+                                        suggestion = { enabled = true, auto_trigger = false },
+                                        panel = { enabled = false },
+                                    })
+                                end,
+                            }
+                        }
+                    },
+                }
+            },
             { 'hrsh7th/cmp-buffer' },
             { 'hrsh7th/cmp-path' },
             { 'saadparwaiz1/cmp_luasnip' },
             { 'hrsh7th/cmp-nvim-lsp' },
-            { 'hrsh7th/cmp-nvim-lua' },
+            { 'hrsh7th/cmp-nvim-lua',    ft = { 'lua' } },
+            {
+                'mrcjkb/rustaceanvim',
+                version = '^4', -- Recommended
+                ft = { 'rust' },
+
+            },
 
             -- Snippets
             { 'L3MON4D3/LuaSnip' },
             { 'rafamadriz/friendly-snippets' },
         }
-    }
-    
-    use('lvimuser/lsp-inlayhints.nvim' )
-    use('simrat39/rust-tools.nvim')
-    
+    },
+
     -- Highlight syntax & folding
-    use('nvim-treesitter/nvim-treesitter', { run = ':TSUpdate' })
+    { 'nvim-treesitter/nvim-treesitter' },
 
     -- Floating terminal
-    use('voldikss/vim-floaterm')
+    'voldikss/vim-floaterm',
 
     -- Navigation plugins
-    use('nvim-lua/plenary.nvim')
-    use({
+    'nvim-lua/plenary.nvim',
+    {
         'nvim-telescope/telescope.nvim',
-        requires = { { 'nvim-lua/plenary.nvim' } }
-    })
+        dependencies = { 'nvim-lua/plenary.nvim' }
+    },
 
     -- Tabs
-    use('kyazdani42/nvim-web-devicons')
-    use('nanozuki/tabby.nvim')
+    'kyazdani42/nvim-web-devicons',
+    'nanozuki/tabby.nvim',
 
     -- Status line
-    use {
+    {
         'nvim-lualine/lualine.nvim',
-        requires = { 'kyazdani42/nvim-web-devicons', opt = true }
-    }
+        dependencies = { 'kyazdani42/nvim-web-devicons' }
+    },
 
     -- Undo history
-    use('mbbill/undotree')
+    'mbbill/undotree',
 
-    -- Copilot
-    use {
-        "zbirenbaum/copilot.lua",
-        cmd = "Copilot",
-        event = "InsertEnter",
-        -- disable default copilot.lua configuartion for avoiding interfere with copilot-cmp
-        config = function()
-            require("copilot").setup({
-                suggestion = { enabled = false },
-                panel = { enabled = false },
-            })
-        end,
-    }
-
-    use {
-        "zbirenbaum/copilot-cmp",
-        after = { "copilot.lua" },
-        config = function()
-            require("copilot_cmp").setup()
-        end
-    }
+    -- Git blame. Commands: EnableBlame/DisableBlame/ToggleBlame
+    'FabijanZulj/blame.nvim',
 
     -- ChatGPT
-    use({
+    {
         "jackMort/ChatGPT.nvim",
-        requires = {
+        dependencies = {
             "MunifTanjim/nui.nvim",
             "nvim-lua/plenary.nvim",
             "nvim-telescope/telescope.nvim"
         }
-    })
+    },
 
-end)
+})
